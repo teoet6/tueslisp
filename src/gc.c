@@ -20,10 +20,12 @@ void *gcalloc(size_t s) {
     return data;
 }
 
-void mark(void *ptr) {
-    if (!ptr) return;
+int mark(void *ptr) {
+    if (!ptr) return 1;
     Allocation *allocation = ptr - sizeof(Allocation);
+    if (allocation->marked) return 1;
     allocation->marked = 1;
+    return 0;
 }
 
 void sweep() {
