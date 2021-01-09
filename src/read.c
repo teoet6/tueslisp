@@ -1,7 +1,7 @@
 #include <string.h>
 #include "tueslisp.h"
 
-#define MAX_TKN_LEN 128
+#define MAX_TKN_LEN 1024
 
 static int line = 1;
 
@@ -40,22 +40,17 @@ static int is_special(char c) {
 	c == '\'' ||
 	c == '`' ||
 	c == ',' ||
-	c == ';' ||
+	c == '#' ||
 	c == EOF;
 }
 
 static void skip_ws(FILE *f) {
     while (1) {
 	while (is_ws(peek_ch(f))) next_ch(f);
-	if (peek_ch(f) == ';')
-	    while (get_ch(f) != '\n');
+	if (peek_ch(f) == '#')
+	    while (peek_ch(f) != '\n' && peek_ch(f) != EOF) next_ch(f);
 	else return;
     }
-}
-
-static void skip_comment(FILE *f) {
-    if (peek_ch(f) != ';') return;
-    while (get_ch(f) != '\n');
 }
 
 /* Right now i dont really use buf_s */
@@ -69,7 +64,12 @@ static char *get_tkn(FILE *f, char *buf, size_t buf_s) {
 	return buf;
     }
     while (!is_special(peek_ch(f)) && !is_ws(peek_ch(f))) {
-	*cur++ = get_ch(f);
+	*cur++ = peek_ch(f);
+        if (peek_ch(f) == '\\') {
+            next_ch(f);
+            *cur++ = peek_ch(f);
+       }
+        next_ch(f);
     }
     *cur++ = 0;
 
@@ -93,8 +93,11 @@ static void next_tkn(FILE *f) {
         next_ch(f);
 	return;
     }
-    while (!is_special(peek_ch(f)) && !is_ws(peek_ch(f)))
+    while (!is_special(peek_ch(f)) && !is_ws(peek_ch(f))) {
+        if (peek_ch(f) == '\\')
+            next_ch(f);
         next_ch(f);
+    }
     return;
 }
 
@@ -133,6 +136,20 @@ static Any* str_to_number(char *num) {
     return make_number(top, 1);
 }
 
+static char* escape(char *str) {
+    char *from = str, *to = str;
+    while (*from) {
+        if (*from == '\\') {
+            from++;
+            if (*from == 'n') *from = '\n';
+            if (*from == 't') *from = '\t';
+        }
+        *to++ = *from++;
+    }
+    *to = 0;
+    return str;
+}
+
 Any *read_any(FILE *f) {
     if (!unexpect(f, ")")) return NULL;
     if (!unexpect(f, ".")) return NULL;
@@ -145,21 +162,20 @@ Any *read_any(FILE *f) {
 	Any *ret = make_nil();
 	Any *cur = ret;
 	peek_tkn(f, tkn, MAX_TKN_LEN);
-    while (strcmp(tkn, ")")) {
-	        Any *cur_read = read_any(f);
+        while (strcmp(tkn, ")")) {
+            Any *cur_read = read_any(f);
     	    set(cur, make_pair(cur_read, make_nil()));
-	        Any *prev = cur;
-	        cur = CDR(cur);
-	        peek_tkn(f, tkn, MAX_TKN_LEN);
-	        if (!strcmp(tkn, ".")) {
-		    next_tkn(f);
-		    CDR(prev) = read_any(f);
-		    if (expect(f, ")")) return NULL;
-		        return ret;
-	        }
+            Any *prev = cur;
+            cur = CDR(cur);
+            peek_tkn(f, tkn, MAX_TKN_LEN);
+            if (!strcmp(tkn, ".")) {
+                next_tkn(f);
+                CDR(prev) = read_any(f);
+                if (expect(f, ")")) return NULL;
+                return ret;
+            }
 	}
 	next_tkn(f);
-	cur->type = NIL;
 	return ret;
     }
     if (!strcmp(tkn, "'")) {
@@ -179,5 +195,5 @@ Any *read_any(FILE *f) {
     }
     if (is_number(tkn))
 	return str_to_number(tkn);
-    return make_symbol(tkn);
+    return make_symbol(escape(tkn));
 }

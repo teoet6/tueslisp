@@ -3,17 +3,20 @@
 #include "tueslisp.h"
 #include "builtin.h"
 
+extern unsigned long long unquote_hash;
+extern unsigned long long quasiquote_hash;
+
 Any *do_quasiquoting(Any *stack, Any *env, Any *body) {
     stack = make_pair(make_nil(), stack);
     if(body->type == PAIR) {
-	if (CAR(body)->type == SYMBOL && CAR(body)->sym->hash == make_hash("unquote")) {
+	if (CAR(body)->type == SYMBOL && CAR(body)->sym->hash == unquote_hash) {
 	    if (list_len(CDR(body)) != 1) {
 		eprintf("Error: unquote expects 1 argument.\n");
 		return NULL;
 	    }
 	    return eval_any(stack, env, CAR(CDR(body)));
 	}
-	if (CAR(body)->type == SYMBOL && CAR(body)->sym->hash == make_hash("quasiquote")) {
+	if (CAR(body)->type == SYMBOL && CAR(body)->sym->hash == quasiquote_hash) {
 	    if (list_len(CDR(body)) != 1) {
 		eprintf("Error: quasiquote expects 1 argument.\n");
 		return NULL;

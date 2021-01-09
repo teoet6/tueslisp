@@ -47,7 +47,6 @@ unsigned long long make_hash(char *s) {
     }
     return hash1 | hash2 << 32;
 }
-
 Any *make_symbol(char *symbol_val) {
     Any *s = make_any();
     s->type = SYMBOL;
@@ -105,6 +104,15 @@ Any *make_lambda(Any *env, Any *params, Any *body) {
     return l;
 }
 
+Any *make_file_pointer(char *filename) {
+    Any *f = make_any();
+    f->type = FILE_POINTER;
+    f->fp = fopen(filename, "r");
+    if (!f->fp)
+        f->type = NIL;
+    return f;
+}
+
 Any *make_bool(int val) {
     if (val) return make_symbol("t");
     return make_nil();
@@ -137,6 +145,9 @@ void mark_any(Any *a) {
 	mark_any(a->lambda->params);
 	mark_any(a->lambda->body);
 	return;
+    case FILE_POINTER:
+        fclose(a->fp);
+        return;
     case EOF: case NIL: case BUILTIN: return;
     }
 }

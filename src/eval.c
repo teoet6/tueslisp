@@ -5,6 +5,8 @@
 // Leave a value of zero to turn off gc
 #define MAX_EVALS_BEFORE_GC 10000
 
+
+
 static Any *eval_args(Any *stack, Any *env, Any *args) {
     stack = make_pair(make_nil(), stack);
     Any *ret = make_nil();
@@ -16,20 +18,19 @@ static Any *eval_args(Any *stack, Any *env, Any *args) {
         cur = CDR(cur);
         args = CDR(args);
     }
-
-    set(cur, make_nil());
     return ret;
 }
 
 static Any *make_env_from_lambda(Any *stack, Any *arg_env, Any *fun, Any *args) {
-    Any *evaled_args = eval_args(stack, arg_env, args);
-    Any *lambda_env = make_clone(fun->lambda->env);
-    Any *params = fun->lambda->params;
-    if (list_len(evaled_args) == -1) {
+    if (list_len(args) == -1) {
         eprintf("Error: ");
+        print_any(stderr, args);
         eprintf(" is not a proper list.\n");
         return NULL;
     }
+    Any *evaled_args = eval_args(stack, arg_env, args);
+    Any *lambda_env = make_clone(fun->lambda->env);
+    Any *params = fun->lambda->params;
     while (params->type == PAIR) {
         if (!evaled_args->type) {
             eprintf("Error: not enough arguments given.\n");

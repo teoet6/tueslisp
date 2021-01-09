@@ -11,6 +11,7 @@
 
 (define t 't)
 (define nil ())
+(define nl '\n)
 
 (define (list . l) l)
 
@@ -21,23 +22,37 @@
                      (last (cdr l))
                      (car l)))
 
-(defmacro (@ fun list)
+(defmacro (apply fun list)
   `(eval (cons ,fun ,list)))
-
-(define (+ . l)
-  (progn
-    (define (iter result left)
-      (if left
-          (iter (plus result (car left)) (cdr left))
-          result))
-    (iter 0 l)))
 
 (define (- . l)
   (if l
       (if (cdr l)
-          (minus (car l) (@ + (cdr l)))
+          (minus (car l) (apply + (cdr l)))
           (minus 0 (car l)))
       0))          
+
+(define (* . l)
+  (progn
+    (define (iter result left)
+      (if left
+          (iter (multiply result (car left)) (cdr left))
+          result))
+    (iter 1 l)))
+
+(define (/ . l)
+  (if l
+      (if (cdr l)
+          (divide (car l) (apply * (cdr l)))
+          (divide 0 (car l)))
+      1))
+
+(define (% . l)
+  (if l
+      (- (car l)
+         (* (whole-part (apply / l))
+            (apply * (cdr l))))
+      0))
 
 (define (= . l)
   (progn
@@ -49,21 +64,29 @@
           t))
     (iter (car l) (cdr l))))
 
-(define (fib n)
-  (progn
-    (define (iter i a b) 
-      (progn (print a)
-        (if (= i n) 
-            a 
-            (iter (+ 1 i) b (+ a b)))))
-    (iter 0 0 1)))
+(defmacro (cond . cases)
+  (if cases
+      `(if ,(car (car cases))
+           ,(car (cdr (car cases)))
+           (apply cond ',(cdr cases)))
+      ()))
+
+(defmacro (import filename) `(eval-file (open-file ',(cat filename '.tl))))
 
 (define (yes sym)
   (progn
     (print sym)
     (yes sym)))
 
-(define (print-yes)
+(define (fib n)
   (progn
-    (define yes 'yes)
-    (print yes)))
+    (define (iter i a b) 
+      (progn (print a)
+        (if (= i n) 
+                    a 
+            (iter (+ 1 i) b (+ a b)))))
+    (iter 0 0 1)))
+
+(define (! n) (if (= n 0) 1 (* n (! (- n 1)))))
+
+(define (loop start end) (if (= start end) end (loop (+ 1 start) end)))
