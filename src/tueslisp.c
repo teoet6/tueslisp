@@ -1,4 +1,5 @@
 #include "tueslisp.h"
+#include <dlfcn.h>
 #include <stdio.h>
 
 unsigned long long unquote_hash;
@@ -40,7 +41,22 @@ void eval_file(Any* stack, Any *env, FILE *fp) {
     }
 }
 
+void dl_test() {
+    void *handle = dlopen("./libs/hello.so", RTLD_NOW);
+    printf("%p\n", handle);
+    if (!handle) {
+        eprintf("%s\n", dlerror());
+        return;
+    }
+        
+    void (*dlfun)() = dlsym(handle, "print_twice");
+    dlfun(make_symbol("asdf"));
+    dlclose(handle);
+}
+
 int main(int argc, char *argv[]) {
+    dl_test();
+    return 0;
     int opened_file = 0;
     global_env = make_nil();
     append_builtins(global_env);

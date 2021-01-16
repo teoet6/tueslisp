@@ -5,8 +5,6 @@
 // Leave a value of zero to turn off gc
 #define MAX_EVALS_BEFORE_GC 10000
 
-
-
 static Any *eval_args(Any *stack, Any *env, Any *args) {
     stack = make_pair(make_nil(), stack);
     Any *ret = make_nil();
@@ -62,8 +60,6 @@ static Any *make_env_from_lambda(Any *stack, Any *arg_env, Any *fun, Any *args) 
 
 static Any *make_body_from_macro(Any *stack, Any *arg_env, Any *fun, Any *args) {
     Any *macro_env = make_clone(fun->lambda->env);
-//    stack = make_pair(make_nil(), stack);
-//    append(macro_env, CAR(stack));
     Any *params = fun->macro->params;
     if (list_len(args) == -1) {
         eprintf("Error: ");
@@ -89,7 +85,6 @@ static Any *make_body_from_macro(Any *stack, Any *arg_env, Any *fun, Any *args) 
         return eval_any(stack, macro_env, fun->macro->body);
     }
     Any *varargs = make_nil();
-//    append(varargs, CAR(stack));
     Any *cur = varargs;
     append(make_pair(params, varargs), macro_env);
     while (args->type) {

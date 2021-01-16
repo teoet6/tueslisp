@@ -1,2 +1,2 @@
 #!/bin/sh
-gcc src/*.c -o tueslisp
+gcc -Wl,--dynamic-list=./exports.txt -ldl src/*.c -o tueslisp 

@@ -1,0 +1,31 @@
+{
+    extern "C"
+    {
+        read_any;
+        eval_any;
+        eval_file;
+        print_any;
+
+        gcalloc;
+        make_clone;
+        make_eof;
+        make_nil;
+        make_pair;
+        make_hash;
+        make_symbol;
+        make_number;
+        make_builtin;
+        make_macro;
+        make_lambda;
+        make_file_pointer;
+        make_bool;
+
+        mark;
+        mark_any;
+        sweep;
+
+        set;
+        append;
+        list_len;
+    };
+};
