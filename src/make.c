@@ -77,10 +77,17 @@ Any *make_number(int top_val, int bot_val) {
     return n;
 }
 
-Any *make_builtin(Builtin builtin_val) {
+Any *make_builtin_macro(Builtin_Macro builtin_macro_val) {
     Any *b = make_any();
-    b->type = BUILTIN;
-    b->builtin = builtin_val;
+    b->type = BUILTIN_MACRO;
+    b->builtin_macro = builtin_macro_val;
+    return b;
+}
+
+Any *make_builtin_function(Any *((*builtin_function_val)(Any*, Any*, Any*))) {
+    Any *b = make_any();
+    b->type = BUILTIN_FUNCTION;
+    b->builtin_function = builtin_function_val;
     return b;
 }
 
@@ -148,6 +155,10 @@ void mark_any(Any *a) {
     case FILE_POINTER:
         fclose(a->fp);
         return;
-    case EOF: case NIL: case BUILTIN: return;
+    case EOF:
+    case NIL:
+    case BUILTIN_MACRO:
+    case BUILTIN_FUNCTION:
+        return;
     }
 }

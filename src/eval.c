@@ -96,6 +96,43 @@ static Any *make_body_from_macro(Any *stack, Any *arg_env, Any *fun, Any *args) 
     return eval_any(stack, macro_env, fun->macro->body);
 }
 
+#define IMPLEMENT_BUILTIN_EVAL {                                \
+        if (list_len(body) != 1) {                              \
+            eprintf("Error: `eval` expects 1 argument.\n");     \
+            return NULL;                                        \
+        }                                                       \
+        body = eval_any(stack, env, CAR(body));                 \
+        RETNULL(body);                                          \
+        stack = CDR(stack);                                     \
+        goto tail_rec;                                          \
+    }                                                           \
+
+#define IMPLEMENT_BUILTIN_PROGN {                                       \
+        if (list_len(body) < 1) {                                       \
+            eprintf("Error: `progn` expects at least 1 argument\n");    \
+        }                                                               \
+        while (CDR(body)->type) {                                       \
+            eval_any(stack, env, CAR(body));                            \
+            body = CDR(body);                                           \
+        }                                                               \
+        body = CAR(body);                                               \
+        stack = CDR(stack);                                             \
+        goto tail_rec;                                                  \
+    }
+
+#define IMPLEMENT_BUILTIN_IF {                                  \
+        if (list_len(body) != 3) {                              \
+            eprintf("Error: `if` expects 3 arguments.\n");      \
+            return NULL;                                        \
+        }                                                       \
+        Any *cond = eval_any(stack, env, CAR(body));            \
+        RETNULL(cond);                                          \
+        if (cond->type) body = CAR(CDR(body));                  \
+        else body = CAR(CDR(CDR(body)));                        \
+        stack = CDR(stack);                                     \
+        goto tail_rec;                                          \
+    }
+
 // The macros that implement builtins expect these arguments to be exactly
 // `stack`, `env` and `body`.
 int evals = 0;
@@ -127,12 +164,15 @@ Any *eval_any(Any *stack, Any *env, Any *body) {
         body = CDR(body);
         RETNULL(fun);
         append(fun, CAR(stack));
-        if (fun->type == BUILTIN) {
-#define CASE(IN, EX) case IN: IMPLEMENT_ ## IN; break;
-            switch(fun->builtin) {
-                FOR_EVERY_BUILTIN(CASE);
+        if (fun->type == BUILTIN_MACRO) {
+            switch(fun->builtin_macro) {
+            case BUILTIN_EVAL: IMPLEMENT_BUILTIN_EVAL;
+            case BUILTIN_PROGN: IMPLEMENT_BUILTIN_PROGN;
+            case BUILTIN_IF: IMPLEMENT_BUILTIN_IF;
             }
-#undef CASE
+        }
+        if (fun->type == BUILTIN_FUNCTION) {
+            return fun->builtin_function(stack, env, body);
         }
         if (fun->type == LAMBDA) {
             env = make_env_from_lambda(stack, env, fun, body);

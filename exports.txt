@@ -14,7 +14,8 @@
         make_hash;
         make_symbol;
         make_number;
-        make_builtin;
+        make_builtin_function;
+        make_builtin_macro;
         make_macro;
         make_lambda;
         make_file_pointer;

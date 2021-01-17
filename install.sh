@@ -7,4 +7,3 @@ if [ ! -d /usr/include/tueslisp ]; then
 fi
 
 cp src/tueslisp.h /usr/include/tueslisp.h
-cp src/builtin.h /usr/include/builtin.h

@@ -1,6 +1,7 @@
 #include "tueslisp.h"
 #include <dlfcn.h>
 #include <stdio.h>
+#include "builtin.h"
 
 unsigned long long unquote_hash;
 unsigned long long quasiquote_hash;
@@ -27,11 +28,38 @@ int list_len(Any *list) {
     return len;
 }
 
-#define APPEND(IN, EX) append(make_pair(make_symbol(EX), make_builtin(IN)), env);
 void append_builtins(Any *env) {
-    FOR_EVERY_BUILTIN(APPEND);
+    append(make_pair(make_symbol("eval"),  make_builtin_macro(BUILTIN_EVAL)),  env);
+    append(make_pair(make_symbol("if"),    make_builtin_macro(BUILTIN_IF)),    env);
+    append(make_pair(make_symbol("progn"), make_builtin_macro(BUILTIN_PROGN)), env);
+    
+#define APPEND_FUNCTION(IN, EX) \
+    append(make_pair(make_symbol(EX), make_builtin_function(IN)), env);
+    APPEND_FUNCTION(builtin_nil_p,      "nil?");              
+    APPEND_FUNCTION(builtin_symbol_p,   "symbol?");       
+    APPEND_FUNCTION(builtin_pair_p,     "pair?");         
+    APPEND_FUNCTION(builtin_number_p,   "number?");       
+    APPEND_FUNCTION(builtin_quote,      "quote");         
+    APPEND_FUNCTION(builtin_quasiquote, "quasiquote");    
+    APPEND_FUNCTION(builtin_cons,       "cons");          
+    APPEND_FUNCTION(builtin_car,        "car");               
+    APPEND_FUNCTION(builtin_cdr,        "cdr");               
+    APPEND_FUNCTION(builtin_cat,        "cat");               
+    APPEND_FUNCTION(builtin_defsym,     "defsym");            
+    APPEND_FUNCTION(builtin_set,        "set!");              
+    APPEND_FUNCTION(builtin_lambda,     "lambda");            
+    APPEND_FUNCTION(builtin_macro,      "macro");             
+    APPEND_FUNCTION(builtin_plus,       "+");                 
+    APPEND_FUNCTION(builtin_minus,      "minus");             
+    APPEND_FUNCTION(builtin_multiply,   "multiply");          
+    APPEND_FUNCTION(builtin_divide,     "divide");            
+    APPEND_FUNCTION(builtin_equal,      "equal");             
+    APPEND_FUNCTION(builtin_whole_part, "whole-part");        
+    APPEND_FUNCTION(builtin_print,      "print");             
+    APPEND_FUNCTION(builtin_open_file,  "open-file");         
+    APPEND_FUNCTION(builtin_eval_file,  "eval-file");
+#undef APPEND_FUNCTION
 }
-#undef APPEND
 
 void eval_file(Any* stack, Any *env, FILE *fp) {
     while (fp) {
@@ -55,8 +83,8 @@ void dl_test() {
 }
 
 int main(int argc, char *argv[]) {
-    dl_test();
-    return 0;
+    /* dl_test(); */
+    /* return 0; */
     int opened_file = 0;
     global_env = make_nil();
     append_builtins(global_env);
@@ -87,7 +115,7 @@ int main(int argc, char *argv[]) {
     }
     if (opened_file) return 0;
 
-    setbuf(stdout, NULL);
+    /* setbuf(stdout, NULL); */
     printf("tueslisp е програма на Теодор Тотев. Направена е като проект\n");
     printf("по програмиране за края на първия срок на девети б клас випуск 2024 в\n");
     printf("Технологично училище Електронни системи към Технически Уневерситет - София.\n");

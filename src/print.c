@@ -32,8 +32,11 @@ Any *print_any(FILE *f, Any *a) {
 	else 
 	    fprintf(f, "%d/%d", a->num->top, a->num->bot);
 	break;
-    case BUILTIN:
-	fprintf(f, "<Builtin function: %d>", a->builtin);
+    case BUILTIN_FUNCTION:
+	fprintf(f, "<Builtin function: %p>", a->builtin_function);
+	break;
+    case BUILTIN_MACRO:
+	fprintf(f, "<Builtin macro: %d>", a->builtin_macro);
 	break;
     case MACRO:
 	fprintf(f, "<Macro ");
