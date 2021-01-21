@@ -3,28 +3,35 @@
 
 #include "tueslisp.h"
 
-Any *builtin_nil_p(Any*, Any*, Any*);     
-Any *builtin_symbol_p(Any*, Any*, Any*);  
-Any *builtin_pair_p(Any*, Any*, Any*);    
-Any *builtin_number_p(Any*, Any*, Any*);  
-Any *builtin_quote(Any*, Any*, Any*);     
-Any *builtin_quasiquote(Any*, Any*, Any*);
-Any *builtin_cons(Any*, Any*, Any*);      
-Any *builtin_car(Any*, Any*, Any*);       
-Any *builtin_cdr(Any*, Any*, Any*);       
-Any *builtin_cat(Any*, Any*, Any*);       
-Any *builtin_defsym(Any*, Any*, Any*);    
-Any *builtin_set(Any*, Any*, Any*);       
-Any *builtin_lambda(Any*, Any*, Any*);    
-Any *builtin_macro(Any*, Any*, Any*);     
-Any *builtin_plus(Any*, Any*, Any*);      
-Any *builtin_minus(Any*, Any*, Any*);     
-Any *builtin_multiply(Any*, Any*, Any*);  
-Any *builtin_divide(Any*, Any*, Any*);    
-Any *builtin_equal(Any*, Any*, Any*);     
-Any *builtin_whole_part(Any*, Any*, Any*);
-Any *builtin_print(Any*, Any*, Any*);     
-Any *builtin_open_file(Any*, Any*, Any*); 
-Any *builtin_eval_file(Any*, Any*, Any*); 
+#define DECL(ID) Any *ID(Any*, Any*, Any*);
+
+DECL(builtin_nil_p);     
+DECL(builtin_symbol_p);  
+DECL(builtin_pair_p);    
+DECL(builtin_number_p);  
+DECL(builtin_quote);     
+DECL(builtin_quasiquote);
+DECL(builtin_cons);      
+DECL(builtin_car);       
+DECL(builtin_cdr);       
+DECL(builtin_cat);       
+DECL(builtin_defsym);    
+DECL(builtin_set);       
+DECL(builtin_lambda);    
+DECL(builtin_macro);     
+DECL(builtin_plus);      
+DECL(builtin_minus);     
+DECL(builtin_multiply);  
+DECL(builtin_divide);    
+DECL(builtin_equal);     
+DECL(builtin_less_than);     
+DECL(builtin_greater_than);     
+DECL(builtin_whole_part);
+DECL(builtin_print);     
+DECL(builtin_import);
+DECL(builtin_extract_function); 
+DECL(builtin_exit); 
+
+#undef DECL
 
 #endif

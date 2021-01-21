@@ -52,8 +52,6 @@ Any *print_any(FILE *f, Any *a) {
 	print_any(f, a->lambda->body);
 	fprintf(f, ">");
 	break;
-    case FILE_POINTER:
-        fprintf(f, "<File %p>", a->fp);
     }
     return a;
 }

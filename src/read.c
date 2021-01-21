@@ -28,28 +28,28 @@ static void next_ch(FILE *f) {
 
 static int is_ws(char c) {
     return
-	c == ' ' ||
-	c == '\n' ||
-	c == '\t';
+        c == ' ' ||
+        c == '\n' ||
+        c == '\t';
 }
 
 static int is_special(char c) {
     return
-	c == '(' ||
-	c == ')' ||
-	c == '\'' ||
-	c == '`' ||
-	c == ',' ||
-	c == '#' ||
-	c == EOF;
+        c == '(' ||
+        c == ')' ||
+        c == '\'' ||
+        c == '`' ||
+        c == ',' ||
+        c == '#' ||
+        c == EOF;
 }
 
 static void skip_ws(FILE *f) {
     while (1) {
-	while (is_ws(peek_ch(f))) next_ch(f);
-	if (peek_ch(f) == '#')
-	    while (peek_ch(f) != '\n' && peek_ch(f) != EOF) next_ch(f);
-	else return;
+        while (is_ws(peek_ch(f))) next_ch(f);
+        if (peek_ch(f) == '#')
+            while (peek_ch(f) != '\n' && peek_ch(f) != EOF) next_ch(f);
+        else return;
     }
 }
 
@@ -59,16 +59,16 @@ static char *get_tkn(FILE *f, char *buf, size_t buf_s) {
     skip_ws(f);
 
     if (is_special(peek_ch(f))) {
-	*cur++ = get_ch(f);
-	*cur++ = 0;
-	return buf;
+        *cur++ = get_ch(f);
+        *cur++ = 0;
+        return buf;
     }
     while (!is_special(peek_ch(f)) && !is_ws(peek_ch(f))) {
-	*cur++ = peek_ch(f);
+        *cur++ = peek_ch(f);
         if (peek_ch(f) == '\\') {
             next_ch(f);
             *cur++ = peek_ch(f);
-       }
+        }
         next_ch(f);
     }
     *cur++ = 0;
@@ -91,7 +91,7 @@ static void next_tkn(FILE *f) {
     skip_ws(f);
     if (is_special(peek_ch(f))) {
         next_ch(f);
-	return;
+        return;
     }
     while (!is_special(peek_ch(f)) && !is_ws(peek_ch(f))) {
         if (peek_ch(f) == '\\')
@@ -106,7 +106,7 @@ static int unexpect(FILE* f, char *unexp) {
     peek_tkn(f, got, MAX_TKN_LEN);
     int ret = strcmp(unexp, got);
     if (!ret) {
-	eprintf("Unexpected '%s'\n", unexp);
+        eprintf("Unexpected '%s'\n", unexp);
     }
     return ret;
 }
@@ -116,24 +116,35 @@ static int expect(FILE *f, char *exp) {
     get_tkn(f, got, MAX_TKN_LEN);
     int ret = strcmp(exp, got);
     if (ret) {
-	eprintf("Expected '%s', got '%s'\n", exp, got);
+        eprintf("Expected '%s', got '%s'\n", exp, got);
     }
     return ret;
 }
 
 static int is_number(char *num) {
     for (char *c = num; *c; c++)
-	if (*c < '0' || *c > '9') return 0;
+        if (*c != '.' && (*c < '0' || *c > '9')) return 0;
+    int dots = 0;
+    for (char *c = num; *c; c++)
+        if (*c == '.') dots++;
+    if (dots > 1) return 0;
     return 1;
 }
 
 static Any* str_to_number(char *num) {
     int top = 0;
+    int bot = 1;
+    int bot_mul = 1;
     for (char *c = num; *c; c++) {
-	top *= 10;
-	top += *c - '0';
+        if (*c == '.') {
+            bot_mul = 10;
+            continue;
+        }
+        top *= 10;
+        top += *c - '0';
+        bot *= bot_mul;
     }
-    return make_number(top, 1);
+    return make_number(top, bot);
 }
 
 static char* escape(char *str) {
@@ -156,15 +167,15 @@ Any *read_any(FILE *f) {
     char tkn[MAX_TKN_LEN];
     get_tkn(f, tkn, MAX_TKN_LEN);
     if (tkn[0] == EOF) {
-	return make_eof();
+        return make_eof();
     }
     if (!strcmp(tkn, "(")) {
-	Any *ret = make_nil();
-	Any *cur = ret;
-	peek_tkn(f, tkn, MAX_TKN_LEN);
+        Any *ret = make_nil();
+        Any *cur = ret;
+        peek_tkn(f, tkn, MAX_TKN_LEN);
         while (strcmp(tkn, ")")) {
             Any *cur_read = read_any(f);
-    	    set(cur, make_pair(cur_read, make_nil()));
+            set(cur, make_pair(cur_read, make_nil()));
             Any *prev = cur;
             cur = CDR(cur);
             peek_tkn(f, tkn, MAX_TKN_LEN);
@@ -174,26 +185,26 @@ Any *read_any(FILE *f) {
                 if (expect(f, ")")) return NULL;
                 return ret;
             }
-	}
-	next_tkn(f);
-	return ret;
+        }
+        next_tkn(f);
+        return ret;
     }
     if (!strcmp(tkn, "'")) {
-	return make_pair(make_symbol("quote"),
-			 make_pair(read_any(f),
-				   make_nil()));
+        return make_pair(make_symbol("quote"),
+                make_pair(read_any(f),
+                    make_nil()));
     }
     if (!strcmp(tkn, "`")) {
-	return make_pair(make_symbol("quasiquote"),
-			 make_pair(read_any(f),
-				   make_nil()));
+        return make_pair(make_symbol("quasiquote"),
+                make_pair(read_any(f),
+                    make_nil()));
     }
     if (!strcmp(tkn, ",")) {
-	return make_pair(make_symbol("unquote"),
-			 make_pair(read_any(f),
-				   make_nil()));
+        return make_pair(make_symbol("unquote"),
+                make_pair(read_any(f),
+                    make_nil()));
     }
     if (is_number(tkn))
-	return str_to_number(tkn);
+        return str_to_number(tkn);
     return make_symbol(escape(tkn));
 }

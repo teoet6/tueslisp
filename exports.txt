@@ -18,13 +18,13 @@
         make_builtin_macro;
         make_macro;
         make_lambda;
-        make_file_pointer;
         make_bool;
 
         mark;
         mark_any;
         sweep;
 
+        gcd;
         set;
         append;
         list_len;

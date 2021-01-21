@@ -1,5 +1,5 @@
 #!/home/teoet6/docs/tues/9/prog/tueslisp/tueslisp
-(import fizzbuzz)
+(import 'fizzbuzz.tl)
 
 # Opredeleno trqbva da ima sym2ascii i ascii2sym funkcii
 # Tova e bavnichko

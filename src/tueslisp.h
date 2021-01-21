@@ -10,6 +10,8 @@
         return NULL;                                            \
     }                                                           \
 
+#define ERROR(...) { eprintf(__VA_ARGS__); return NULL; }
+
 /* The end of file type should never be external. */
 /* It is for internal use only. */
 typedef enum Type {
@@ -22,7 +24,6 @@ typedef enum Type {
     BUILTIN_FUNCTION,
     MACRO,
     LAMBDA,
-    FILE_POINTER,
 } Type;
 
 extern unsigned long long unquote_hash;
@@ -73,7 +74,6 @@ struct Any {
         Any *((*builtin_function)(Any*, Any*, Any*));
         Callable *macro;
         Callable *lambda;
-        FILE *fp;
     };
 };
 
@@ -96,13 +96,13 @@ Any *make_builtin_macro(Builtin_Macro);
 Any *make_builtin_function(Any *(*)(Any *, Any*, Any*));
 Any *make_macro(Any*, Any*, Any*);
 Any *make_lambda(Any*, Any*, Any*);
-Any *make_file_pointer(char*);
 Any *make_bool(int);
 
 int mark(void*);
 void mark_any(Any*);
 void sweep();
 
+int gcd(int, int);
 Any *set(Any*, Any*);
 void append(Any*, Any*);
 int list_len(Any*);

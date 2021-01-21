@@ -13,6 +13,14 @@ Any *set(Any *dest, Any *src) {
     return dest;
 }
 
+int gcd(int a, int b) {
+    a = a < 0 ? -a : a;
+    b = b < 0 ? -b : b;
+    if (a < b) return gcd(b, a);
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+
 void append(Any *item, Any *list) {
     Any *old_list = make_clone(list);
     set(list, make_pair(item, old_list));
@@ -35,29 +43,32 @@ void append_builtins(Any *env) {
     
 #define APPEND_FUNCTION(IN, EX) \
     append(make_pair(make_symbol(EX), make_builtin_function(IN)), env);
-    APPEND_FUNCTION(builtin_nil_p,      "nil?");              
-    APPEND_FUNCTION(builtin_symbol_p,   "symbol?");       
-    APPEND_FUNCTION(builtin_pair_p,     "pair?");         
-    APPEND_FUNCTION(builtin_number_p,   "number?");       
-    APPEND_FUNCTION(builtin_quote,      "quote");         
-    APPEND_FUNCTION(builtin_quasiquote, "quasiquote");    
-    APPEND_FUNCTION(builtin_cons,       "cons");          
-    APPEND_FUNCTION(builtin_car,        "car");               
-    APPEND_FUNCTION(builtin_cdr,        "cdr");               
-    APPEND_FUNCTION(builtin_cat,        "cat");               
-    APPEND_FUNCTION(builtin_defsym,     "defsym");            
-    APPEND_FUNCTION(builtin_set,        "set!");              
-    APPEND_FUNCTION(builtin_lambda,     "lambda");            
-    APPEND_FUNCTION(builtin_macro,      "macro");             
-    APPEND_FUNCTION(builtin_plus,       "+");                 
-    APPEND_FUNCTION(builtin_minus,      "minus");             
-    APPEND_FUNCTION(builtin_multiply,   "multiply");          
-    APPEND_FUNCTION(builtin_divide,     "divide");            
-    APPEND_FUNCTION(builtin_equal,      "equal");             
-    APPEND_FUNCTION(builtin_whole_part, "whole-part");        
-    APPEND_FUNCTION(builtin_print,      "print");             
-    APPEND_FUNCTION(builtin_open_file,  "open-file");         
-    APPEND_FUNCTION(builtin_eval_file,  "eval-file");
+    APPEND_FUNCTION(builtin_nil_p,            "nil?");              
+    APPEND_FUNCTION(builtin_symbol_p,         "symbol?");       
+    APPEND_FUNCTION(builtin_pair_p,           "pair?");         
+    APPEND_FUNCTION(builtin_number_p,         "number?");       
+    APPEND_FUNCTION(builtin_quote,            "quote");         
+    APPEND_FUNCTION(builtin_quasiquote,       "quasiquote");    
+    APPEND_FUNCTION(builtin_cons,             "cons");          
+    APPEND_FUNCTION(builtin_car,              "car");               
+    APPEND_FUNCTION(builtin_cdr,              "cdr");               
+    APPEND_FUNCTION(builtin_cat,              "cat");               
+    APPEND_FUNCTION(builtin_defsym,           "defsym");            
+    APPEND_FUNCTION(builtin_set,              "set!");              
+    APPEND_FUNCTION(builtin_lambda,           "lambda");            
+    APPEND_FUNCTION(builtin_macro,            "macro");             
+    APPEND_FUNCTION(builtin_plus,             "+");                 
+    APPEND_FUNCTION(builtin_minus,            "-");             
+    APPEND_FUNCTION(builtin_multiply,         "*");          
+    APPEND_FUNCTION(builtin_divide,           "/");            
+    APPEND_FUNCTION(builtin_equal,            "equal");             
+    APPEND_FUNCTION(builtin_less_than,        "<");             
+    APPEND_FUNCTION(builtin_greater_than,     ">");             
+    APPEND_FUNCTION(builtin_whole_part,       "whole-part");        
+    APPEND_FUNCTION(builtin_print,            "print");             
+    APPEND_FUNCTION(builtin_import,           "import");
+    APPEND_FUNCTION(builtin_extract_function, "extract-function");
+    APPEND_FUNCTION(builtin_exit,             "exit");
 #undef APPEND_FUNCTION
 }
 

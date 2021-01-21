@@ -57,14 +57,6 @@ Any *make_symbol(char *symbol_val) {
     return s;
 }
 
-int gcd(int a, int b) {
-    a = a < 0 ? -a : a;
-    b = b < 0 ? -b : b;
-    if (a < b) return gcd(b, a);
-    if (b == 0) return a;
-    return gcd(b, a % b);
-}
-
 Any *make_number(int top_val, int bot_val) {
     int simple = gcd(top_val, bot_val);
     top_val /= simple;
@@ -111,15 +103,6 @@ Any *make_lambda(Any *env, Any *params, Any *body) {
     return l;
 }
 
-Any *make_file_pointer(char *filename) {
-    Any *f = make_any();
-    f->type = FILE_POINTER;
-    f->fp = fopen(filename, "r");
-    if (!f->fp)
-        f->type = NIL;
-    return f;
-}
-
 Any *make_bool(int val) {
     if (val) return make_symbol("t");
     return make_nil();
@@ -152,9 +135,6 @@ void mark_any(Any *a) {
 	mark_any(a->lambda->params);
 	mark_any(a->lambda->body);
 	return;
-    case FILE_POINTER:
-        fclose(a->fp);
-        return;
     case EOF:
     case NIL:
     case BUILTIN_MACRO:
