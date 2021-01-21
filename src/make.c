@@ -57,8 +57,12 @@ Any *make_symbol(char *symbol_val) {
     return s;
 }
 
-Any *make_number(int top_val, int bot_val) {
-    int simple = gcd(top_val, bot_val);
+Any *make_number(long long top_val, long long bot_val) {
+    long long simple = gcd(top_val, bot_val);
+    if (bot_val < 0) {
+        top_val *= -1;
+        bot_val *= -1;
+    }
     top_val /= simple;
     bot_val /= simple;
     Any *n = make_any();

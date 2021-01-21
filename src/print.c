@@ -28,9 +28,9 @@ Any *print_any(FILE *f, Any *a) {
 	break;
     case NUMBER:
 	if (a->num->bot == 1)
-	    fprintf(f, "%d", a->num->top);
+	    fprintf(f, "%lld", a->num->top);
 	else 
-	    fprintf(f, "%d/%d", a->num->top, a->num->bot);
+	    fprintf(f, "%lld/%lld", a->num->top, a->num->bot);
 	break;
     case BUILTIN_FUNCTION:
 	fprintf(f, "<Builtin function: %p>", a->builtin_function);

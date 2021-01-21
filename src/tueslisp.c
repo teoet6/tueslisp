@@ -13,7 +13,7 @@ Any *set(Any *dest, Any *src) {
     return dest;
 }
 
-int gcd(int a, int b) {
+long long gcd(long long a, long long b) {
     a = a < 0 ? -a : a;
     b = b < 0 ? -b : b;
     if (a < b) return gcd(b, a);

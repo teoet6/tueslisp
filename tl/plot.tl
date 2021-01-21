@@ -1,8 +1,8 @@
 (import 'sdl.tl)
 
 (define cell-px 2)
-(define cell-units .1)
-(define cells 250)
+(define cell-units .01)
+(define cells 200)
 (define draw-treshold (* cell-units 1.415))
 
 (define (abs x) (if (< x 0) (- x) x))
@@ -22,7 +22,6 @@
       (fill-cell x y)
       ()))
 
-
 (define (plot lhs rhs)
   (open-window 'Plot (* cell-px cells) (* cell-px cells))
   (define (iter-x x)
@@ -35,3 +34,5 @@
         (progn (iter-y 0) (iter-x (+ 1 x)))))
   (iter-x 0))
 
+(define (plot-bool-cell f x y)
+  (if (f (cell-to-unit x) (- (cell-to-unit y))) (fill-cell x y) ()))

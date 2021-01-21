@@ -132,9 +132,9 @@ static int is_number(char *num) {
 }
 
 static Any* str_to_number(char *num) {
-    int top = 0;
-    int bot = 1;
-    int bot_mul = 1;
+    long long top = 0;
+    long long bot = 1;
+    long long bot_mul = 1;
     for (char *c = num; *c; c++) {
         if (*c == '.') {
             bot_mul = 10;

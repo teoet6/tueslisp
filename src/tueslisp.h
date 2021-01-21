@@ -54,8 +54,8 @@ struct Pair {
 #define CDR(X) (X)->pair->cdr
 
 struct Number {
-    int top;
-    int bot;
+    long long top;
+    long long bot;
 };
 
 struct Callable {
@@ -91,7 +91,7 @@ Any *make_nil();
 Any *make_pair(Any*, Any*);
 unsigned long long make_hash(char*);
 Any *make_symbol(char*);
-Any *make_number(int, int);
+Any *make_number(long long, long long);
 Any *make_builtin_macro(Builtin_Macro);
 Any *make_builtin_function(Any *(*)(Any *, Any*, Any*));
 Any *make_macro(Any*, Any*, Any*);
@@ -102,7 +102,7 @@ int mark(void*);
 void mark_any(Any*);
 void sweep();
 
-int gcd(int, int);
+long long gcd(long long, long long);
 Any *set(Any*, Any*);
 void append(Any*, Any*);
 int list_len(Any*);

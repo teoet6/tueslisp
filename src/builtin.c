@@ -171,7 +171,7 @@ BUILTIN_LAMBDA_OR_MACRO(macro);
 Any *builtin_plus(Any *stack, Any *env, Any *body) {
     if (list_len(body) < 0)
         return NULL;
-    int top = 0, bot = 1;
+    long long top = 0, bot = 1;
     while (body->type) {
         Any *cur = eval_any(stack, env, CAR(body));
         RETNULL(cur);
@@ -180,7 +180,7 @@ Any *builtin_plus(Any *stack, Any *env, Any *body) {
         top = top * cur->num->bot + cur->num->top * bot;
         bot = bot * cur->num->bot;
 
-        int simple = gcd(top, bot);
+        long long simple = gcd(top, bot);
         top /= simple;
         bot /= simple;
 
@@ -196,7 +196,7 @@ Any *builtin_minus(Any *stack, Any *env, Any *body) {
     if (len == 0)
         return make_number(0, 1);
     Any *cur;
-    int first_top = 0, first_bot = 1, rest_top = 0, rest_bot = 1;
+    long long first_top = 0, first_bot = 1, rest_top = 0, rest_bot = 1;
     cur = eval_any(stack, env, CAR(body));
     RETNULL(cur);
     if (cur->type != NUMBER)
@@ -214,7 +214,7 @@ Any *builtin_minus(Any *stack, Any *env, Any *body) {
         rest_top = rest_top * cur->num->bot + cur->num->top * rest_bot;
         rest_bot *= cur->num->bot;
 
-        int simple = gcd(rest_top, rest_bot);
+        long long simple = gcd(rest_top, rest_bot);
         rest_top /= simple;
         rest_bot /= simple;
 
@@ -227,7 +227,7 @@ Any *builtin_minus(Any *stack, Any *env, Any *body) {
 Any *builtin_multiply(Any *stack, Any *env, Any *body) {
     if (list_len(body) < 0)
         return NULL;
-    int top = 1, bot = 1;
+    long long top = 1, bot = 1;
     while (body->type) {
         Any *cur = eval_any(stack, env, CAR(body));
         RETNULL(cur);
@@ -236,7 +236,7 @@ Any *builtin_multiply(Any *stack, Any *env, Any *body) {
         top *= cur->num->top;
         bot *= cur->num->bot;
 
-        int simple = gcd(top, bot);
+        long long simple = gcd(top, bot);
         top /= simple;
         bot /= simple;
 
@@ -252,7 +252,7 @@ Any *builtin_divide(Any *stack, Any *env, Any *body) {
     if (len == 0)
         return make_number(0, 1);
     Any *cur;
-    int first_top = 1, first_bot = 1, rest_top = 1, rest_bot = 1;
+    long long first_top = 1, first_bot = 1, rest_top = 1, rest_bot = 1;
     cur = eval_any(stack, env, CAR(body));
     RETNULL(cur);
     if (cur->type != NUMBER)
@@ -270,7 +270,7 @@ Any *builtin_divide(Any *stack, Any *env, Any *body) {
         rest_top *= cur->num->top;
         rest_bot *= cur->num->bot;
 
-        int simple = gcd(rest_top, rest_bot);
+        long long simple = gcd(rest_top, rest_bot);
         rest_top /= simple;
         rest_bot /= simple;
 
