@@ -37,6 +37,8 @@ static int is_special(char c) {
     return
         c == '(' ||
         c == ')' ||
+        c == '{' ||
+        c == '}' ||
         c == '\'' ||
         c == '`' ||
         c == ',' ||
@@ -163,6 +165,7 @@ static char* escape(char *str) {
 
 Any *read_any(FILE *f) {
     if (!unexpect(f, ")")) return NULL;
+    if (!unexpect(f, "}")) return NULL;
     if (!unexpect(f, ".")) return NULL;
     char tkn[MAX_TKN_LEN];
     get_tkn(f, tkn, MAX_TKN_LEN);
@@ -183,6 +186,26 @@ Any *read_any(FILE *f) {
                 next_tkn(f);
                 CDR(prev) = read_any(f);
                 if (expect(f, ")")) return NULL;
+                return ret;
+            }
+        }
+        next_tkn(f);
+        return ret;
+    }
+    if (!strcmp(tkn, "{")) {
+        Any *ret = make_pair(make_symbol("progn"), make_nil());
+        Any *cur = CDR(ret);
+        peek_tkn(f, tkn, MAX_TKN_LEN);
+        while (strcmp(tkn, "}")) {
+            Any *cur_read = read_any(f);
+            set(cur, make_pair(cur_read, make_nil()));
+            Any *prev = cur;
+            cur = CDR(cur);
+            peek_tkn(f, tkn, MAX_TKN_LEN);
+            if (!strcmp(tkn, ".")) {
+                next_tkn(f);
+                CDR(prev) = read_any(f);
+                if (expect(f, "}")) return NULL;
                 return ret;
             }
         }

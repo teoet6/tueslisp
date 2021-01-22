@@ -28,10 +28,10 @@
     (define (iter-y y)
       (if (= y cells) 
           () 
-          (progn (plot-cell lhs rhs x y) (iter-y (+ 1 y)))))
+          {(plot-cell lhs rhs x y) (iter-y (+ 1 y))}))
     (if (= x cells)
         ()
-        (progn (iter-y 0) (iter-x (+ 1 x)))))
+        {(iter-y 0) (iter-x (+ 1 x))}))
   (iter-x 0))
 
 (define (plot-bool-cell f x y)
